@@ -14,10 +14,7 @@
 #    limitations under the License.
 ################################################################################
 
-from hpcc-pyutils.config import config_functions
-from hpcc-pyutils.crypto import crypto
-from hpcc-pyutils.svn import svn
-from hpcc-pyutils.cleanup import cleanup
+from cleanup import cleanup
 
 __author__ = 'Michael Gardner'
 __author_email__ = 'michael.gardner@lexisnexisrisk.com'
