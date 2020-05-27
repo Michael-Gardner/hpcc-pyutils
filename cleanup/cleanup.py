@@ -1,4 +1,4 @@
-#    HPCC SYSTEMS software Copyright (C) 2019 HPCC Systems.
+#    HPCC SYSTEMS software Copyright (C) 2020 HPCC Systems.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -12,9 +12,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import sys
 import time
 import os
+import glob
+import logging
 
 
 class Cleanup:
@@ -24,11 +25,29 @@ class Cleanup:
     """
 
     def __init__(self, directory, days=30, suffix="log"):
-        self.suffix = suffix
-        self.directory = directory
+        searchpath = "%s/**/*%s" % (directory, suffix)
+        files = glob.glob(searchpath, recursive=True)
+        self.oldfiles = []
         # convert days to seconds for later time conversions
-        self.time = ( days * 86400 )
+        current_time = time.time()
+        past_time = current_time - ( days * 86400 )
+        for f in files:
+            if os.stat(f).st_mtime < past_time:
+                self.oldfiles.append(f)
 
+    def delete(self):
+        for f in self.oldfiles:
+            if os.path.isfile(f):
+                logging.info("deleting: %s", f)
+                os.remove(f)
 
-    def delete(self)
-        
+    def list(self):
+        for f in self.oldfiles:
+            logging.info("oldfiles: %s", f)
+            print("%s", f)
+
+if __name__ == '__main__':
+    logging.basicConfig(filename='cleanup.log',level=logging.INFO)
+
+    mycleanup = Cleanup('/var/log/HPCCSystems')
+    mycleanup.list()
